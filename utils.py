@@ -2,20 +2,17 @@ import numpy as np
 from matplotlib import pyplot as plt
 from math import *
 
-SET_NUMBER = ""
+SET_NUMBER = "10"
 KEY_SIZE = 32
 MEASURES_NUMBER = 999
 MSG_TITLE = "msg_"
 TRACE_TITLE = "curve_"
 FILE_FORMAT = ".txt"
-DATA_PATH = "./EMSE/Etudiant - " + SET_NUMBER + "/"
+DATA_PATH = "./etudiant - " + SET_NUMBER + "/"
 
 #Calculates the Hamming weight of the parameter, i.e. the number of '1' in binary
 def hamming_weight(x):    
     return bin(x).count("1")
-
-#Opens and reads the chosen file
-def open_files(title, size):
     
 
 #Returns p and q the two prime numbers that compose N = p*q
@@ -42,9 +39,28 @@ def getN(file) :
     
     return int(N)
 
-def openFile(title, size) :
+#Opens and reads the chosen file
+def open_file(title):
     file = open(title, "r")
     data = []   #table that collects data
-    
-    for i in range(size) :
-        
+    for n in file :
+        data = n.split()
+    if len(data) == 1:
+        data = int(data[0])
+    else:
+        for i in range(len(data)):
+            data[i] = float(data[i])
+    return data
+
+
+def mod_inverse(x,y):
+
+    def eea(a,b):
+        if b==0:return (1,0)
+        (q,r) = (a//b,a%b)
+        (s,t) = eea(b,r)
+        return (t, s-(q*t) )
+
+    inv = eea(x,y)[0]
+    if inv < 1: inv += y
+    return inv

@@ -4,11 +4,13 @@ from math import *
 
 SET_NUMBER = "10"
 KEY_SIZE = 32
-MEASURES_NUMBER = 999
+MEASURES_NUMBER = 1000
 MSG_TITLE = "msg_"
 TRACE_TITLE = "curve_"
+N_TITLE = "N.txt"
 FILE_FORMAT = ".txt"
 DATA_PATH = "./etudiant - " + SET_NUMBER + "/"
+E = 2**16 + 1
 
 #Calculates the Hamming weight of the parameter, i.e. the number of '1' in binary
 def hamming_weight(x):    

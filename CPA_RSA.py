@@ -13,7 +13,6 @@ E = 2**16 + 1
 #Calculates the Hamming weight of the parameter, i.e. the number of '1' in binary
 def hamming_weight(x):    
     return bin(x).count("1")
-    
 
 #Returns p and q the two prime numbers that compose N = p*q
 def find_prime_factors(N):
@@ -33,6 +32,7 @@ def find_prime_factors(N):
         
     return prime_factors
 
+#Retrieves the N data from "N.txt" file
 def getN(file) :
     f = open(file, "r")
     N = f.read()
@@ -53,7 +53,7 @@ def open_file(title):
     file.close()
     return data
 
-
+#Retrieves the modular inverse using the Extended Euclidian Algorithm
 def mod_inverse(x,y):
 
     def eea(a,b):
@@ -66,6 +66,7 @@ def mod_inverse(x,y):
     if inv < 1: inv += y
     return inv
 
+#Montgomery multiplication implementation
 def M_d_mod_N(M, d, N):
     T = M
     h_weight = 0
@@ -94,8 +95,8 @@ def CPA_attack(data, N) :
     
     counter = 2
     
-    while(data[0][counter] != -1000):
-        for i in range(MEASURES_NUMBER):
+    while(data[0][counter] != -1000):   #while consumption data is still relevant
+        for i in range(MEASURES_NUMBER):   #for every message
             #Hypothesis : bit is set
             temp_d = [0] + hyp_d
             hamming_weight_for_zeros[i] = M_d_mod_N(data[i][0], temp_d, N)
@@ -103,7 +104,7 @@ def CPA_attack(data, N) :
             temp_d = [1] + hyp_d
             hamming_weight_for_ones[i] = M_d_mod_N(data[i][0], temp_d, N)
         
-        temp_data = []
+        temp_data = []    #formatting for corrcoeff function
         for i in range(MEASURES_NUMBER) :
             temp_data.append(data[i][counter:counter + 1])
         
@@ -113,18 +114,19 @@ def CPA_attack(data, N) :
         coeff_corr_one = mat_corr_ones[1][0]
         coeff_corr_zero = mat_corr_zeros[1][0]
         
-        if(coeff_corr_zero >= coeff_corr_one) :
+        if(coeff_corr_zero >= coeff_corr_one) :   #if unset bit is more likely
             hyp_d = [0] + hyp_d
-            counter += 1
+            counter += 1   #only one operation made
             mat_coeff_corr_finale.append(coeff_corr_zero)
         else :
             hyp_d = [1] + hyp_d
-            counter += 2
+            counter += 2   #two operations made
             mat_coeff_corr_finale.append(coeff_corr_one)
             
     hyp_d.reverse()
     return hyp_d, mat_coeff_corr_finale
 
+#attack on RSA by factoring N
 def factorisation(e, n) :
     p, q = find_prime_factors(n)
     
@@ -133,8 +135,9 @@ def factorisation(e, n) :
     
     return real_d
     
-data = MEASURES_NUMBER*[[]]
 
+#importing data from files    
+data = MEASURES_NUMBER*[[]]
 for i in range(MEASURES_NUMBER) :
          title = DATA_PATH + MSG_TITLE + str(i) + FILE_FORMAT
          msg = open_file(title)
@@ -143,9 +146,8 @@ for i in range(MEASURES_NUMBER) :
          trace = open_file(title)
          data[i] = data[i] + trace
             
-
-N = getN(DATA_PATH + N_TITLE)
-d, coeff_final = CPA_attack(data, N)
+N = getN(DATA_PATH + N_TITLE)   #importing N
+d, coeff_final = CPA_attack(data, N)   #performing CPA attack
 print("Correlation coefficients for every bit with CPA attack")
 print(coeff_final)
 
@@ -154,7 +156,7 @@ for bit in d :
     d_str += str(bit)
 print("Key found by CPA attack : 0b" + d_str)
 
-real_d = factorisation(E, N)
+real_d = factorisation(E, N)   #performing attack by factoring
 print("Key found by factoring : " + bin(real_d))
 
 print("Writing key in file...")
